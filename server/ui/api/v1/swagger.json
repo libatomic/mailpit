@@ -463,6 +463,69 @@
         }
       }
     },
+    "/api/v1/message/{ID}/bounce": {
+      "post": {
+        "description": "Bounce a message with the specified reason and SMTP status code.\n\nThe ID can be set to `latest` to reference the latest message.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "text/plain"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "message"
+        ],
+        "summary": "Bounce message",
+        "operationId": "BounceMessageParams",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Message database ID or \"latest\"",
+            "name": "ID",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [
+                "Reason",
+                "Code"
+              ],
+              "properties": {
+                "Reason": {
+                  "description": "Bounce reason",
+                  "type": "string",
+                  "example": "Mailbox Not Found"
+                },
+                "Code": {
+                  "description": "SMTP status code",
+                  "type": "string",
+                  "example": "5.1.1"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/OKResponse"
+          },
+          "400": {
+            "$ref": "#/responses/ErrorResponse"
+          },
+          "404": {
+            "$ref": "#/responses/NotFoundResponse"
+          }
+        }
+      }
+    },
     "/api/v1/message/{ID}/sa-check": {
       "get": {
         "description": "Returns the SpamAssassin summary (if enabled) of the message.\n\nThe ID can be set to `latest` to return the latest message.",

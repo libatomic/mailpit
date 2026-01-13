@@ -7,3 +7,6 @@
 /.idea
 *.old
 *.db
+yarn.lock
+__debug_bin*
+.vscode/

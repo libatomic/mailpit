@@ -469,6 +469,17 @@ export default {
 				});
 			});
 		},
+
+		bounceMessage(reason, code) {
+			if (!this.message) {
+				return false;
+			}
+
+			const uri = this.resolve("/api/v1/message/" + this.message.ID + "/bounce");
+			this.post(uri, { Reason: reason, Code: code }, () => {
+				// Handle success
+			});
+		},
 	},
 };
 </script>
@@ -592,6 +603,55 @@ export default {
 							</RouterLink>
 						</li>
 					</template>
+				</ul>
+			</div>
+
+			<div id="BounceBtn" class="dropdown d-inline-block ms-1 ms-sm-2">
+				<button
+					type="button"
+					class="btn btn-outline-light dropdown-toggle"
+					data-bs-toggle="dropdown"
+					aria-expanded="false"
+				>
+					<i class="bi bi-arrow-return-left"></i>
+					<span class="d-none d-md-inline ms-1">Bounce</span>
+				</button>
+				<ul class="dropdown-menu dropdown-menu-end">
+					<li>
+						<button class="dropdown-item" @click="bounceMessage('Mailbox Not Found', '5.1.1')">
+							Mailbox Not Found
+						</button>
+					</li>
+					<li>
+						<button class="dropdown-item" @click="bounceMessage('Mailbox Full', '5.1.2')">
+							Mailbox Full
+						</button>
+					</li>
+					<li>
+						<button class="dropdown-item" @click="bounceMessage('User Unknown', '5.1.3')">
+							User Unknown
+						</button>
+					</li>
+					<li>
+						<button class="dropdown-item" @click="bounceMessage('Domain Not Found', '5.1.4')">
+							Domain Not Found
+						</button>
+					</li>
+					<li>
+						<button class="dropdown-item" @click="bounceMessage('Message Too Large', '5.1.5')">
+							Message Too Large
+						</button>
+					</li>
+					<li>
+						<button class="dropdown-item" @click="bounceMessage('Relay Access Denied', '5.1.6')">
+							Relay Access Denied
+						</button>
+					</li>
+					<li>
+						<button class="dropdown-item" @click="bounceMessage('Temporary Failure', '5.1.7')">
+							Temporary Failure
+						</button>
+					</li>
 				</ul>
 			</div>
 

@@ -218,6 +218,31 @@ type releaseMessageParams struct {
 	}
 }
 
+// swagger:parameters BounceMessageParams
+type bounceMessageParams struct {
+	// Message database ID
+	//
+	// in: path
+	// description: Message database ID or "latest"
+	// required: true
+	ID string
+
+	// in: body
+	Body struct {
+		// Bounce reason
+		//
+		// required: true
+		// example: Mailbox Not Found
+		Reason string
+
+		// SMTP status code
+		//
+		// required: true
+		// example: 5.1.1
+		Code string
+	}
+}
+
 // swagger:parameters SendMessageParams
 type sendMessageParams struct {
 	// in: body
