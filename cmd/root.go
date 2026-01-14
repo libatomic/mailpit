@@ -353,6 +353,24 @@ func initConfigFromEnv() {
 	config.SMTPForwardConfig.To = os.Getenv("MP_SMTP_FORWARD_TO")
 	config.SMTPForwardConfig.ForwardSMTPErrors = getEnabledFromEnv("MP_SMTP_FORWARD_FWD_SMTP_ERRORS")
 
+	// SMTP bounce relay
+	config.SMTPBounceConfig = config.SMTPBounceConfigStruct{}
+	config.SMTPBounceConfig.Host = os.Getenv("MP_BOUNCE_RELAY_ADDR")
+	if len(os.Getenv("MP_BOUNCE_RELAY_PORT")) > 0 {
+		config.SMTPBounceConfig.Port, _ = strconv.Atoi(os.Getenv("MP_BOUNCE_RELAY_PORT"))
+	} else if config.SMTPBounceConfig.Host != "" {
+		// Default to port 587 if host is set but port is not
+		config.SMTPBounceConfig.Port = 587
+	}
+	config.SMTPBounceConfig.STARTTLS = getEnabledFromEnv("MP_BOUNCE_RELAY_STARTTLS")
+	config.SMTPBounceConfig.TLS = getEnabledFromEnv("MP_BOUNCE_RELAY_TLS")
+	config.SMTPBounceConfig.AllowInsecure = getEnabledFromEnv("MP_BOUNCE_RELAY_ALLOW_INSECURE")
+	config.SMTPBounceConfig.Auth = os.Getenv("MP_BOUNCE_RELAY_AUTH")
+	config.SMTPBounceConfig.Username = os.Getenv("MP_BOUNCE_RELAY_USER")
+	config.SMTPBounceConfig.Password = os.Getenv("MP_BOUNCE_RELAY_PASS")
+	config.SMTPBounceConfig.Secret = os.Getenv("MP_BOUNCE_RELAY_SECRET")
+	config.SMTPBounceConfig.From = os.Getenv("MP_BOUNCE_FROM")
+
 	// Chaos
 	chaos.Enabled = getEnabledFromEnv("MP_ENABLE_CHAOS")
 	config.ChaosTriggers = os.Getenv("MP_CHAOS_TRIGGERS")

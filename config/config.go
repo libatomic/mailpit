@@ -171,6 +171,9 @@ var (
 	// SMTPForwardConfig to parse a yaml file and store config of the forwarding SMTP server
 	SMTPForwardConfig SMTPForwardConfigStruct
 
+	// SMTPBounceConfig for bounce message relay configuration
+	SMTPBounceConfig SMTPBounceConfigStruct
+
 	// SMTPStrictRFCHeaders will return an error if the email headers contain <CR><CR><LF> (\r\r\n)
 	// @see https://github.com/axllent/mailpit/issues/87 & https://github.com/axllent/mailpit/issues/153
 	SMTPStrictRFCHeaders bool
@@ -273,6 +276,20 @@ type SMTPForwardConfigStruct struct {
 	ReturnPath        string `yaml:"return-path"`         // allow overriding the bounce address
 	OverrideFrom      string `yaml:"override-from"`       // allow overriding of the from address
 	ForwardSMTPErrors bool   `yaml:"forward-smtp-errors"` // whether to log smtp-errors or forward them to upstream-client
+}
+
+// SMTPBounceConfigStruct struct for bounce message relay configuration
+type SMTPBounceConfigStruct struct {
+	Host          string `yaml:"host"`           // SMTP host
+	Port          int    `yaml:"port"`            // SMTP port
+	STARTTLS      bool   `yaml:"starttls"`       // whether to use STARTTLS
+	TLS           bool   `yaml:"tls"`            // whether to use TLS
+	AllowInsecure bool   `yaml:"allow-insecure"` // allow insecure authentication, ignore TLS validation
+	Auth          string `yaml:"auth"`           // none, plain, login, cram-md5
+	Username      string `yaml:"username"`       // plain & cram-md5
+	Password      string `yaml:"password"`       // plain
+	Secret        string `yaml:"secret"`         // cram-md5
+	From          string `yaml:"from"`           // From address for bounce messages
 }
 
 // VerifyConfig wil do some basic checking

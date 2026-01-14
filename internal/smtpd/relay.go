@@ -168,6 +168,128 @@ func Relay(from string, to []string, msg []byte) error {
 	return c.Quit()
 }
 
+// createBounceSMTPClient creates an SMTP client for bounce messages
+func createBounceSMTPClient(config config.SMTPBounceConfigStruct, addr string) (*smtp.Client, error) {
+	if config.TLS {
+		tlsConf := &tls.Config{ServerName: config.Host} // #nosec
+		tlsConf.InsecureSkipVerify = config.AllowInsecure
+
+		conn, err := tls.Dial("tcp", addr, tlsConf)
+		if err != nil {
+			return nil, fmt.Errorf("TLS dial error: %v", err)
+		}
+
+		client, err := smtp.NewClient(conn, tlsConf.ServerName)
+		if err != nil {
+			_ = conn.Close()
+			return nil, fmt.Errorf("SMTP client error: %v", err)
+		}
+
+		return client, nil
+	}
+
+	client, err := smtp.Dial(addr)
+	if err != nil {
+		return nil, fmt.Errorf("error connecting to %s: %v", addr, err)
+	}
+
+	// Set the hostname for HELO/EHLO
+	if hostname, err := os.Hostname(); err == nil {
+		if err := client.Hello(hostname); err != nil {
+			return nil, fmt.Errorf("error saying HELO/EHLO to %s: %v", addr, err)
+		}
+	}
+
+	if config.STARTTLS {
+		tlsConf := &tls.Config{ServerName: config.Host} // #nosec
+		tlsConf.InsecureSkipVerify = config.AllowInsecure
+
+		if err = client.StartTLS(tlsConf); err != nil {
+			_ = client.Close()
+			return nil, fmt.Errorf("error creating StartTLS config: %v", err)
+		}
+	}
+
+	return client, nil
+}
+
+// bounceAuthFromConfig returns the SMTP bounce authentication based on config
+func bounceAuthFromConfig(config config.SMTPBounceConfigStruct) smtp.Auth {
+	var a smtp.Auth
+
+	if config.Auth == "" || config.Auth == "none" {
+		return nil
+	}
+
+	if config.Username == "" {
+		return nil
+	}
+
+	switch strings.ToLower(config.Auth) {
+	case "plain":
+		if config.Password != "" {
+			a = smtp.PlainAuth("", config.Username, config.Password, config.Host)
+		}
+	case "login":
+		if config.Password != "" {
+			a = LoginAuth(config.Username, config.Password)
+		}
+	case "cram-md5":
+		if config.Secret != "" {
+			a = smtp.CRAMMD5Auth(config.Username, config.Secret)
+		}
+	}
+
+	return a
+}
+
+// BounceRelay will connect to a pre-configured SMTP server and send a bounce message.
+func BounceRelay(to string, msg []byte) error {
+	if config.SMTPBounceConfig.Host == "" {
+		return fmt.Errorf("bounce relay not configured")
+	}
+
+	addr := fmt.Sprintf("%s:%d", config.SMTPBounceConfig.Host, config.SMTPBounceConfig.Port)
+
+	c, err := createBounceSMTPClient(config.SMTPBounceConfig, addr)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = c.Close() }()
+
+	auth := bounceAuthFromConfig(config.SMTPBounceConfig)
+
+	if auth != nil {
+		if err = c.Auth(auth); err != nil {
+			return fmt.Errorf("error response to AUTH command: %s", err.Error())
+		}
+	}
+
+	// Use empty Return-Path for bounce messages
+	if err = c.Mail(""); err != nil {
+		return errors.WithMessage(err, "error sending MAIL command")
+	}
+
+	if err = c.Rcpt(to); err != nil {
+		return errors.WithMessagef(err, "error response to RCPT command for %s", to)
+	}
+
+	w, err := c.Data()
+	if err != nil {
+		return errors.WithMessage(err, "error response to DATA command")
+	}
+
+	if _, err := w.Write(msg); err != nil {
+		return errors.WithMessage(err, "error sending message")
+	}
+
+	if err := w.Close(); err != nil {
+		return errors.WithMessage(err, "error closing connection")
+	}
+
+	return c.Quit()
+}
+
 // Return the SMTP relay authentication based on config
 func relayAuthFromConfig() smtp.Auth {
 	var a smtp.Auth
