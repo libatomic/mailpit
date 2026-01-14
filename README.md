@@ -110,10 +110,10 @@ If installed using homebrew, you may run `brew services start mailpit` to always
 
 Mailpit can generate and send Delivery Status Notification (DSN) bounce messages via a configured SMTP relay server. This is useful for testing how your application handles bounced emails.
 
-Configure the bounce relay using the following environment variables:
+By default, bounce messages are sent back to the same Mailpit instance on `127.0.0.1:1025`, creating a complete testing loop. You can configure a different SMTP server using the following environment variables:
 
-- `MP_BOUNCE_RELAY_ADDR` - SMTP server address for sending bounce messages (required)
-- `MP_BOUNCE_RELAY_PORT` - SMTP port (defaults to 587 if not set)
+- `MP_BOUNCE_RELAY_ADDR` - SMTP server address for sending bounce messages (defaults to `127.0.0.1`)
+- `MP_BOUNCE_RELAY_PORT` - SMTP port (defaults to `1025` to match Mailpit's SMTP port)
 - `MP_BOUNCE_RELAY_STARTTLS` - Enable STARTTLS (set to `1` or `true`)
 - `MP_BOUNCE_RELAY_TLS` - Enable TLS (set to `1` or `true`)
 - `MP_BOUNCE_RELAY_ALLOW_INSECURE` - Allow insecure TLS connections (set to `1` or `true`)

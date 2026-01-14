@@ -355,12 +355,20 @@ func initConfigFromEnv() {
 
 	// SMTP bounce relay
 	config.SMTPBounceConfig = config.SMTPBounceConfigStruct{}
-	config.SMTPBounceConfig.Host = os.Getenv("MP_BOUNCE_RELAY_ADDR")
-	if len(os.Getenv("MP_BOUNCE_RELAY_PORT")) > 0 {
-		config.SMTPBounceConfig.Port, _ = strconv.Atoi(os.Getenv("MP_BOUNCE_RELAY_PORT"))
-	} else if config.SMTPBounceConfig.Host != "" {
-		// Default to port 587 if host is set but port is not
-		config.SMTPBounceConfig.Port = 587
+	bounceAddr := os.Getenv("MP_BOUNCE_RELAY_ADDR")
+	if bounceAddr == "" {
+		// Default to localhost to bounce back to the same Mailpit instance
+		config.SMTPBounceConfig.Host = "127.0.0.1"
+	} else {
+		config.SMTPBounceConfig.Host = bounceAddr
+	}
+
+	bouncePort := os.Getenv("MP_BOUNCE_RELAY_PORT")
+	if len(bouncePort) > 0 {
+		config.SMTPBounceConfig.Port, _ = strconv.Atoi(bouncePort)
+	} else {
+		// Default to Mailpit's SMTP port (1025) if not specified
+		config.SMTPBounceConfig.Port = 1025
 	}
 	config.SMTPBounceConfig.STARTTLS = getEnabledFromEnv("MP_BOUNCE_RELAY_STARTTLS")
 	config.SMTPBounceConfig.TLS = getEnabledFromEnv("MP_BOUNCE_RELAY_TLS")

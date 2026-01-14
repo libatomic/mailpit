@@ -77,12 +77,6 @@ func BounceMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check if bounce relay is configured
-	if config.SMTPBounceConfig.Host == "" {
-		httpError(w, "Bounce relay not configured. Please set MP_BOUNCE_RELAY_ADDR")
-		return
-	}
-
 	// Determine bounce address: ReturnPath -> ReplyTo -> From
 	var bounceAddress string
 	var bounceAddressName string
