@@ -477,7 +477,15 @@ export default {
 
 			const uri = this.resolve("/api/v1/message/" + this.message.ID + "/bounce");
 			this.post(uri, { Reason: reason, Code: code }, () => {
-				// Handle success
+				// Show a success popup that the bounce was sent
+				this.$bvToast
+					? this.$bvToast.toast("Bounce sent successfully.", {
+							title: "Success",
+							variant: "success",
+							solid: true,
+							autoHideDelay: 4000,
+						})
+					: alert("Bounce sent successfully.");
 			});
 		},
 	},

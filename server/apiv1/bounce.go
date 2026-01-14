@@ -176,7 +176,7 @@ func buildDSNMessage(originalMsg *storage.Message, originalRaw []byte, returnPat
 	var dsn bytes.Buffer
 
 	// Headers
-	dsn.WriteString("Return-Path: <>\r\n")
+	//	dsn.WriteString("Return-Path: <>\r\n")
 	dsn.WriteString(fmt.Sprintf("Date: %s\r\n", time.Now().Format(time.RFC1123Z)))
 	dsn.WriteString(fmt.Sprintf("From: %s\r\n", bounceFrom))
 	dsn.WriteString(fmt.Sprintf("To: %s\r\n", returnPath))
