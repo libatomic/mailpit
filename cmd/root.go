@@ -378,6 +378,23 @@ func initConfigFromEnv() {
 	config.SMTPBounceConfig.Password = os.Getenv("MP_BOUNCE_RELAY_PASS")
 	config.SMTPBounceConfig.Secret = os.Getenv("MP_BOUNCE_RELAY_SECRET")
 	config.SMTPBounceConfig.From = os.Getenv("MP_BOUNCE_FROM")
+	config.SMTPBounceConfig.MailFrom = os.Getenv("MP_BOUNCE_MAILFROM")
+	// MailFrom defaults to From if not explicitly set
+	if config.SMTPBounceConfig.MailFrom == "" && config.SMTPBounceConfig.From != "" {
+		// Extract email address from From header if it's in "Name <email@domain.com>" format
+		from := config.SMTPBounceConfig.From
+		if strings.Contains(from, "<") && strings.Contains(from, ">") {
+			// Extract email address from between < >
+			start := strings.Index(from, "<")
+			end := strings.Index(from, ">")
+			if start < end {
+				config.SMTPBounceConfig.MailFrom = from[start+1 : end]
+			}
+		} else {
+			// Use From as-is if it's just an email address
+			config.SMTPBounceConfig.MailFrom = from
+		}
+	}
 
 	// Chaos
 	chaos.Enabled = getEnabledFromEnv("MP_ENABLE_CHAOS")

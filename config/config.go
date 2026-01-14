@@ -281,7 +281,7 @@ type SMTPForwardConfigStruct struct {
 // SMTPBounceConfigStruct struct for bounce message relay configuration
 type SMTPBounceConfigStruct struct {
 	Host          string `yaml:"host"`           // SMTP host
-	Port          int    `yaml:"port"`            // SMTP port
+	Port          int    `yaml:"port"`           // SMTP port
 	STARTTLS      bool   `yaml:"starttls"`       // whether to use STARTTLS
 	TLS           bool   `yaml:"tls"`            // whether to use TLS
 	AllowInsecure bool   `yaml:"allow-insecure"` // allow insecure authentication, ignore TLS validation
@@ -289,7 +289,8 @@ type SMTPBounceConfigStruct struct {
 	Username      string `yaml:"username"`       // plain & cram-md5
 	Password      string `yaml:"password"`       // plain
 	Secret        string `yaml:"secret"`         // cram-md5
-	From          string `yaml:"from"`           // From address for bounce messages
+	From          string `yaml:"from"`           // From address for bounce messages (email header)
+	MailFrom      string `yaml:"mail-from"`      // MAIL FROM address for bounce messages (SMTP envelope, defaults to empty)
 }
 
 // VerifyConfig wil do some basic checking

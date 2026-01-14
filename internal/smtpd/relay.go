@@ -265,8 +265,9 @@ func BounceRelay(to string, msg []byte) error {
 		}
 	}
 
-	// Use empty Return-Path for bounce messages
-	if err = c.Mail(""); err != nil {
+	// Use configured MailFrom (defaults to empty for bounce messages per RFC 3464)
+	mailFrom := config.SMTPBounceConfig.MailFrom
+	if err = c.Mail(mailFrom); err != nil {
 		return errors.WithMessage(err, "error sending MAIL command")
 	}
 

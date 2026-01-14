@@ -121,7 +121,8 @@ By default, bounce messages are sent back to the same Mailpit instance on `127.0
 - `MP_BOUNCE_RELAY_USER` - Username for authentication
 - `MP_BOUNCE_RELAY_PASS` - Password for authentication
 - `MP_BOUNCE_RELAY_SECRET` - Secret for CRAM-MD5 authentication
-- `MP_BOUNCE_FROM` - From address for bounce messages (e.g., `Mail Delivery Subsystem <MAILER-DAEMON@example.com>`)
+- `MP_BOUNCE_FROM` - From address for bounce messages (email header, e.g., `Mail Delivery Subsystem <MAILER-DAEMON@example.com>`)
+- `MP_BOUNCE_MAILFROM` - MAIL FROM address for bounce messages (SMTP envelope sender, defaults to email address extracted from `MP_BOUNCE_FROM` if not set)
 
 Example configuration:
 
