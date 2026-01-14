@@ -95,12 +95,17 @@ func BounceMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	logger.Log().Debugf("[bounce] bounce address: %s", bounceAddress)
+	logger.Log().Debugf("[bounce] bounce address name: %s", bounceAddressName)
+
 	// Parse bounce address
 	bounceAddr, err := mail.ParseAddress(bounceAddress)
 	if err != nil {
 		httpError(w, fmt.Sprintf("Invalid %s address: %s", bounceAddressName, err.Error()))
 		return
 	}
+
+	logger.Log().Debugf("[bounce] parsed bounce address: %s", bounceAddr.Address)
 
 	// Get raw message for DSN construction
 	rawMsg, err := storage.GetMessageRaw(id)
