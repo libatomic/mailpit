@@ -25,7 +25,7 @@
 
 It acts as an SMTP server, provides a modern web interface to view & test captured emails, and includes an API for automated integration testing.
 
-Mailpit was originally **inspired** by MailHog which is [no longer maintained](https://github.com/mailhog/MailHog/issues/442#issuecomment-1493415258) and hasn't seen active development or security updates for a few years now.
+> **Note**: This is a fork of [Mailpit](https://github.com/axllent/mailpit) with additional bounce message functionality. The original Mailpit was inspired by MailHog which is [no longer maintained](https://github.com/mailhog/MailHog/issues/442#issuecomment-1493415258).
 
 ![Mailpit](https://raw.githubusercontent.com/axllent/mailpit/develop/server/ui-src/screenshot.png)
 
@@ -47,6 +47,7 @@ including image thumbnails), including optional [HTTPS](https://mailpit.axllent.
 - [Message tagging](https://mailpit.axllent.org/docs/usage/tagging/) including manual tagging or automated tagging using filtering and "plus addressing"
 - [SMTP relaying](https://mailpit.axllent.org/docs/configuration/smtp-relay/) (message release) - relay messages via a different SMTP server including an optional allowlist of accepted recipients
 - [SMTP forwarding](https://mailpit.axllent.org/docs/configuration/smtp-forward/) - automatically forward messages via a different SMTP server to predefined email addresses
+- [Message bouncing](https://mailpit.axllent.org/docs/configuration/bounce/) - generate and send Delivery Status Notification (DSN) bounce messages via a configured SMTP relay server with customizable bounce reasons and SMTP status codes
 - Fast message [storing & processing](https://mailpit.axllent.org/docs/configuration/email-storage/) - ingesting 100-200 emails per second over SMTP depending on CPU, network speed & email size,
 easily handling tens of thousands of emails, with automatic email pruning (by default keeping the most recent 500 emails)
 - [Chaos](https://mailpit.axllent.org/docs/integration/chaos/) feature to enable configurable SMTP errors to test application resilience
@@ -103,6 +104,38 @@ To build Mailpit from source, see [Building from source](https://mailpit.axllent
 Run `mailpit -h` to see options. More information can be seen in [the docs](https://mailpit.axllent.org/docs/configuration/runtime-options/).
 
 If installed using homebrew, you may run `brew services start mailpit` to always run mailpit automatically.
+
+
+### Bounce Message Configuration
+
+Mailpit can generate and send Delivery Status Notification (DSN) bounce messages via a configured SMTP relay server. This is useful for testing how your application handles bounced emails.
+
+Configure the bounce relay using the following environment variables:
+
+- `MP_BOUNCE_RELAY_ADDR` - SMTP server address for sending bounce messages (required)
+- `MP_BOUNCE_RELAY_PORT` - SMTP port (defaults to 587 if not set)
+- `MP_BOUNCE_RELAY_STARTTLS` - Enable STARTTLS (set to `1` or `true`)
+- `MP_BOUNCE_RELAY_TLS` - Enable TLS (set to `1` or `true`)
+- `MP_BOUNCE_RELAY_ALLOW_INSECURE` - Allow insecure TLS connections (set to `1` or `true`)
+- `MP_BOUNCE_RELAY_AUTH` - Authentication method: `plain`, `login`, or `cram-md5`
+- `MP_BOUNCE_RELAY_USER` - Username for authentication
+- `MP_BOUNCE_RELAY_PASS` - Password for authentication
+- `MP_BOUNCE_RELAY_SECRET` - Secret for CRAM-MD5 authentication
+- `MP_BOUNCE_FROM` - From address for bounce messages (e.g., `Mail Delivery Subsystem <MAILER-DAEMON@example.com>`)
+
+Example configuration:
+
+```bash
+export MP_BOUNCE_RELAY_ADDR="smtp.example.com"
+export MP_BOUNCE_RELAY_PORT="587"
+export MP_BOUNCE_RELAY_STARTTLS="1"
+export MP_BOUNCE_RELAY_AUTH="plain"
+export MP_BOUNCE_RELAY_USER="bounce@example.com"
+export MP_BOUNCE_RELAY_PASS="password"
+export MP_BOUNCE_FROM="Mail Delivery Subsystem <MAILER-DAEMON@example.com>"
+```
+
+Once configured, you can use the bounce feature from the web UI by clicking the "Bounce" button next to any message and selecting a bounce reason (e.g., "Mailbox Not Found", "Mailbox Full", etc.).
 
 
 ### Testing Mailpit
